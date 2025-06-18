@@ -19,7 +19,7 @@ app.use("/api", require("./Routes/CreateUser"));
 app.use("/api", require("./Routes/DisplayData"));
 app.use("/api", require("./Routes/OrderData"));
 app.use("/api", require("./Routes/Profile"));
-app.use("/api", require("./routes/otp")); // move this after middleware
+app.use("/api", require("./Routes/Otp")); // move this after middleware
 
 // ✅ Root endpoint
 app.get("/", (req, res) => {
