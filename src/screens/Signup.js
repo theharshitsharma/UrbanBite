@@ -15,7 +15,6 @@ function Signup() {
   });
 
   const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
 
   const onChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
@@ -23,58 +22,69 @@ function Signup() {
 
   const sendOTP = async (e) => {
     e.preventDefault();
-    const response = await fetch("https://urbanbite-backend.onrender.com/api/sendotp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: credentials.email })
-    });
+    try {
+      const response = await fetch("http://localhost:5000/api/sendotp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: credentials.email })
+      });
 
-    const json = await response.json();
-    if (json.success) {
-      setOtpSent(true);
-      toast.success("OTP sent to your email", { position: "top-center", autoClose: 3000 });
-    } else {
-      toast.error("Failed to send OTP", { position: "top-center", autoClose: 3000 });
+      const json = await response.json();
+      if (json.success) {
+        setOtpSent(true);
+        toast.success("OTP sent to your email", { position: "top-center", autoClose: 3000 });
+      } else {
+        toast.error("Failed to send OTP", { position: "top-center", autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.error("Server error while sending OTP", { position: "top-center", autoClose: 3000 });
     }
   };
 
   const verifyOTP = async (e) => {
     e.preventDefault();
-    const response = await fetch("http://localhost:5000/api/verifyotp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: credentials.email, otp: credentials.otp })
-    });
-
-    const json = await response.json();
-    if (json.success) {
-      setOtpVerified(true);
-      toast.success("OTP verified! Completing registration...", {
-        position: "top-center",
-        autoClose: 1500,
+    try {
+      const response = await fetch("http://localhost:5000/api/verifyotp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: credentials.email, otp: credentials.otp })
       });
-      completeSignup();
-    } else {
-      toast.error("Invalid or expired OTP", { position: "top-center", autoClose: 3000 });
+
+      const json = await response.json();
+      if (json.success) {
+        toast.success("OTP verified! Completing registration...", {
+          position: "top-center",
+          autoClose: 1500,
+        });
+        completeSignup();
+      } else {
+        toast.error("Invalid or expired OTP", { position: "top-center", autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.error("Server error during OTP verification", { position: "top-center", autoClose: 3000 });
     }
   };
 
   const completeSignup = async () => {
-    const response = await fetch("http://localhost:5000/api/createuser", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(credentials)
-    });
-
-    const json = await response.json();
-    if (!json.success) {
-      toast.error("Signup failed!", { position: "top-center", autoClose: 3000 });
-    } else {
-      toast.success("Signup successful! Redirecting...", {
-        position: "top-center",
-        autoClose: 2000,
-        onClose: () => navigate("/login")
+    try {
+      const response = await fetch("http://localhost:5000/api/createuser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials)
       });
+
+      const json = await response.json();
+      if (!json.success) {
+        toast.error("Signup failed!", { position: "top-center", autoClose: 3000 });
+      } else {
+        toast.success("Signup successful! Redirecting...", {
+          position: "top-center",
+          autoClose: 2000,
+          onClose: () => navigate("/login")
+        });
+      }
+    } catch (error) {
+      toast.error("Server error during signup", { position: "top-center", autoClose: 3000 });
     }
   };
 
