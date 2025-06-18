@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 
 // ✅ Middlewares
 app.use(cors({
-  origin: "https://urbanbite-frontend.onrender.com", // change to frontend URL when deploying
+  origin: "http://localhost:3000", // change to frontend URL when deploying
   credentials: true
 }));
 app.use(express.json());
