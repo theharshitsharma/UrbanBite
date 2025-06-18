@@ -6,15 +6,18 @@ const cors = require("cors");
 // ✅ Use Render-provided port or fallback to 5000 for local development
 const PORT = process.env.PORT || 5000;
 
+// ✅ Allowed CORS origins
+const allowedOrigins = [
+  "http://localhost:3000",                          // local development
+  "https://urbanbite-frontend.onrender.com"         // deployed frontend (replace if needed)
+];
+
 // ✅ Middlewares
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
-
-// ✅ Connect to MongoDB
-connectDB();
 
 // ✅ API Routes
 app.use("/api", require("./Routes/CreateUser"));
@@ -28,7 +31,14 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// ✅ Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+// ✅ Start server only after DB connects
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Failed to connect to MongoDB:", err);
+    process.exit(1); // exit with failure
+  });

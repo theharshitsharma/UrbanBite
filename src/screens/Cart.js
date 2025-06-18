@@ -22,7 +22,7 @@ let navigate=useNavigate()
     console.log("📦 userEmail:", userEmail);
 
     try {
-      const response = await fetch("http://localhost:5000/api/orderData", {
+      const response = await fetch("https://urbanbite-backend.onrender.com/api/orderData",{
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

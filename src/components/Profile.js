@@ -7,7 +7,7 @@ function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       const email = localStorage.getItem('userEmail');
-      const res = await fetch("http://localhost:5000/api/userprofile", {
+      const res = await fetch("https://urbanbite-backend.onrender.com/api/userprofile",{
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

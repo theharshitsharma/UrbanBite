@@ -5,7 +5,7 @@ export default function MyOrder() {
 
   const fetchMyOrder = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/myorderData", {
+      const res = await fetch("https://urbanbite-backend.onrender.com/api/myorderData",{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export default function MyOrder() {
   }, [fetchMyOrder]);
   const deleteSingleItem = async (orderDate, item) => {
   try {
-    const res = await fetch("http://localhost:5000/api/deleteItemFromOrder", {
+    const res = await fetch("https://urbanbite-backend.onrender.com/api/deleteItemFromData",{
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
@@ -54,7 +54,7 @@ export default function MyOrder() {
 
 const deleteOrder = async (orderGroupId) => {
   try {
-    const res = await fetch("http://localhost:5000/api/deleteOrder", {
+    const res = await fetch("https://urbanbite-backend.onrender.com/api/deleteOrder",{
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
