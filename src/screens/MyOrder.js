@@ -5,7 +5,10 @@ export default function MyOrder() {
 
   const fetchMyOrder = useCallback(async () => {
     try {
-      const res = await fetch("https://urbanbite-backend.onrender.com/api/myorderData",{
+      const BASE_URL1 = process.env.NODE_ENV === "development"
+  ? "http://localhost:5000/api/myorderData"
+  : "https://urbanbite-backend.onrender.com/api/myorderData";
+      const res = await fetch(BASE_URL1,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +30,11 @@ export default function MyOrder() {
   }, [fetchMyOrder]);
   const deleteSingleItem = async (orderDate, item) => {
   try {
-    const res = await fetch("https://urbanbite-backend.onrender.com/api/deleteItemFromData",{
+    const BASE_URL2 = process.env.NODE_ENV === "development"
+  ? "http://localhost:5000/api/deleteItemFromData"
+  : "https://urbanbite-backend.onrender.com/api/deleteItemFromData";
+    
+    const res = await fetch(BASE_URL2,{
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"
@@ -54,7 +61,10 @@ export default function MyOrder() {
 
 const deleteOrder = async (orderGroupId) => {
   try {
-    const res = await fetch("https://urbanbite-backend.onrender.com/api/deleteOrder",{
+       const BASE_URL3 = process.env.NODE_ENV === "development"
+  ? "http://localhost:5000/api/deleteOrder"
+  : "https://urbanbite-backend.onrender.com/api/deleteOrder";
+    const res = await fetch(BASE_URL3,{
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"

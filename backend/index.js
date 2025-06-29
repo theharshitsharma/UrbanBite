@@ -6,13 +6,14 @@ const connectDB = require("./db");
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
-  "http://localhost:3000",
-  "https://urbanbite-frontend.onrender.com"
+  "http://localhost:10000",
+  "https://urbanbite-frontend.onrender.com",
+  "https://urbanbite-frontend.onrender.com/"
 ];
 
 app.use(cors({
   origin: allowedOrigins,
-  methods: ["GET", "POST", "OPTIONS"],
+  
   credentials: true
 }));
 app.use(express.json());

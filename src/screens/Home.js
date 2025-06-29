@@ -14,7 +14,10 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res  = await fetch("https://urbanbite-backend.onrender.com/api/foodData",{
+        const BASE_URL = process.env.NODE_ENV === "development"
+  ? "http://localhost:5000"
+  : "https://urbanbite-backend.onrender.com";
+        const res  = await fetch(BASE_URL,{
           method: "POST",
           headers: { "Content-Type": "application/json" },
         });
