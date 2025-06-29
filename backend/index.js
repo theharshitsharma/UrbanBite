@@ -15,6 +15,7 @@ app.use(cors({
   methods: ["GET", "POST", "OPTIONS"],
   credentials: true
 }));
+app.options('*', cors());
 app.use(express.json());
 
 app.use("/api", require("./Routes/CreateUser"));
