@@ -24,6 +24,8 @@ export default function Card({ foodItem, foodName, imgSrc, options = {} }) {
       navigate('/login');
       return;
     }
+        const cartItemId = `${id}-${selectedSize}`;
+
 
 const existing = cartData.find(ci =>
   ci.id === id &&
@@ -31,10 +33,10 @@ const existing = cartData.find(ci =>
   ci.name === foodName
 );
     if (existing) {
-      await dispatch({ type: 'UPDATE', id, size: selectedSize, price: finalPrice, qty });
+      await dispatch({ type: 'UPDATE', id:cartItemId, size: selectedSize, price: finalPrice, qty:existing.qty + qty });
       toast.success("Item updated in cart!");
     } else {
-      await dispatch({ type: 'ADD', id, name: foodName, price: finalPrice, qty, size: selectedSize, img: imgSrc || fallbackImg });
+      await dispatch({ type: 'ADD', id:cartItemId, name: foodName, price: finalPrice, qty, size: selectedSize, img: imgSrc || fallbackImg });
       toast.success("Item added to cart!");
     }
   };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatchCart } from '../components/ContextReducer';
 
 export default function Login() {
   const [credentials, setcredentials] = useState({
@@ -8,6 +9,7 @@ export default function Login() {
   });
 
   let navigate = useNavigate();
+  const dispatch = useDispatchCart(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +32,8 @@ export default function Login() {
       alert("Invalid email or password");
       return;
     }
+    dispatch({ type: "DROP" });
+
 
     localStorage.setItem("userEmail", credentials.email);
     localStorage.setItem("authToken", json.authToken);

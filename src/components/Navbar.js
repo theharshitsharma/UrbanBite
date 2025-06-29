@@ -11,7 +11,9 @@ export default function Navbar() {
   const dispatch = useDispatchCart();
 
   const handleLogout = () => {
+    dispatch({ type: "DROP" }); // Reset cart state
     localStorage.removeItem("authToken");
+    localStorage.removeItem("userEmail");
     navigate("/login");
   };
 
