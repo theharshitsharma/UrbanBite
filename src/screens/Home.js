@@ -15,7 +15,7 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const res  = await fetch("https://urbanbite-backend.onrender.com/api/foodData",{
-          method: "GET",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
         });
         const data = await res.json(); // API returns [ itemsArr, categoriesArr ]
