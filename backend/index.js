@@ -7,8 +7,8 @@ const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
   "http://localhost:10000",
-  "https://urbanbite-frontend.onrender.com",
-  "https://urbanbite-frontend.onrender.com/"
+  
+  "https://urbanbite-4ewi.onrender.com"
 ];
 
 app.use(cors({
