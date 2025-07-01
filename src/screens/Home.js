@@ -17,10 +17,10 @@ export default function Home() {
         const BASE_URL = process.env.NODE_ENV === "development"
   ? "http://localhost:5000"
   : "https://urbanbite-backend.onrender.com";
-        const res  = await fetch(BASE_URL,{
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
+       const res = await fetch(`${BASE_URL}/api/foodData`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+});
         const data = await res.json(); // API returns [ itemsArr, categoriesArr ]
         setFoodItem(Array.isArray(data?.[0]) ? data[0] : []);
         setFoodCat(Array.isArray(data?.[1]) ? data[1] : []);

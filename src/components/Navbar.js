@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Badge from "react-bootstrap/Badge";
 import Modal from "react-bootstrap/Modal";
+import ThemeToggle from "./ThemeToggle";
 import { useCart, useDispatchCart } from './ContextReducer';
 
 export default function Navbar() {
@@ -62,6 +63,7 @@ export default function Navbar() {
 
             {localStorage.getItem("authToken") ? (
               <div className="d-flex align-items-center gap-2">
+                <ThemeToggle/>
                 <button
                   className="btn btn-light text-success position-relative"
                   onClick={handleCartOpen}

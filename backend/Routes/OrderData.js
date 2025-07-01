@@ -76,7 +76,7 @@ router.delete('/deleteOrder', async (req, res) => {
   }
 });
 
-router.delete('/deleteItemFromOrder', async (req, res) => {
+router.delete('/deleteItemFromData', async (req, res) => {
   const { email, orderDate, name, size } = req.body;
 
   try {
