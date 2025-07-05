@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatchCart } from '../components/ContextReducer';
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Login() {
   const [credentials, setcredentials] = useState({
@@ -27,6 +29,12 @@ export default function Login() {
 
     const json = await response.json();
     console.log(json);
+    if(json.success){
+    toast.success("Login successful!!!", {
+              position: "top-center",
+              autoClose: 2000,
+              onClose: () => navigate("/")
+            });}
 
     if (!json.success) {
       alert("Invalid email or password");
@@ -37,6 +45,7 @@ export default function Login() {
 
     localStorage.setItem("userEmail", credentials.email);
     localStorage.setItem("authToken", json.authToken);
+     
     navigate("/");
   };
 

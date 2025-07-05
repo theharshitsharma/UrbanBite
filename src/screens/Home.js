@@ -1,27 +1,37 @@
-import React, { useEffect, useState } from "react";
-// import Navbar from "../components/Navbar";
+import React, { useEffect, useState, useMemo } from "react";
 import Footer from "../components/Footer";
-import Card   from "../components/Card";
+import Card from "../components/Card";
 
 export default function Home() {
-  /* ---------------- state ---------------- */
-  const [foodCat,  setFoodCat]  = useState([]);   // categories
-  const [foodItem, setFoodItem] = useState([]);   // items
-  const [search,   setSearch]   = useState("");   // search box
-  const [loading,  setLoading]  = useState(true); // fetch status
+  const [foodCat, setFoodCat] = useState([]);
+  const [foodItem, setFoodItem] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  /* ---------------- fetch once on mount ---------------- */
+  // Debounce effect
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      setDebouncedSearch(search.trim().toLowerCase());
+    }, 200); // 300ms delay
+
+    return () => clearTimeout(delay);
+  }, [search]);
+
+  // Fetch food data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const BASE_URL = process.env.NODE_ENV === "development"
-  ? "http://localhost:5000"
-  : "https://urbanbite-backend.onrender.com";
-       const res = await fetch(`${BASE_URL}/api/foodData`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-});
-        const data = await res.json(); // API returns [ itemsArr, categoriesArr ]
+        const BASE_URL =
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:5000"
+            : "https://urbanbite-backend.onrender.com";
+
+        const res = await fetch(`${BASE_URL}/api/foodData`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await res.json();
         setFoodItem(Array.isArray(data?.[0]) ? data[0] : []);
         setFoodCat(Array.isArray(data?.[1]) ? data[1] : []);
       } catch (err) {
@@ -34,7 +44,22 @@ export default function Home() {
     fetchData();
   }, []);
 
-  /* ---------------- carousel images ---------------- */
+  // Memoized filtered items grouped by category
+  const filteredItemsByCategory = useMemo(() => {
+    const result = {};
+    for (let category of foodCat) {
+      const items = foodItem.filter(
+        (item) =>
+          item?.CategoryName === category?.CategoryName &&
+          item?.name?.toLowerCase().includes(debouncedSearch)
+      );
+      if (items.length > 0 || debouncedSearch === "") {
+        result[category.CategoryName] = items;
+      }
+    }
+    return result;
+  }, [foodCat, foodItem, debouncedSearch]);
+
   const carouselImages = [
     "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=60",
     "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=60",
@@ -42,16 +67,14 @@ export default function Home() {
     "https://images.unsplash.com/photo-1521305916504-4a1121188589?auto=format&fit=crop&w=1200&q=60",
   ];
 
-  /* ---------------- UI ---------------- */
   return (
     <>
-      
-
       {/* ---------- Carousel ---------- */}
       <div
         id="carouselExampleFade"
         className="carousel slide carousel-fade"
         data-bs-ride="carousel"
+        data-bs-interval="2000"
         style={{ maxHeight: "500px", overflow: "hidden" }}
       >
         <div className="carousel-inner">
@@ -60,15 +83,22 @@ export default function Home() {
             className="carousel-caption d-none d-md-block"
             style={{ zIndex: 10 }}
           >
-            <div className="d-flex justify-content-center">
-              <input
-                className="form-control me-2 w-50"
-                type="search"
-                placeholder="Search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
+            <div className="d-flex justify-content-center position-relative">
+  <input
+    className="form-control me-2 w-50"
+    type="search"
+    placeholder="Search food or category"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    style={{
+      paddingRight: "2.5rem",
+      WebkitAppearance: "none",
+      MozAppearance: "none",
+    }}
+  />
+
+</div>
+
           </div>
 
           {/* Slides */}
@@ -108,44 +138,30 @@ export default function Home() {
         </button>
       </div>
 
-      {/* ---------- Food cards ---------- */}
+      {/* ---------- Food Cards ---------- */}
       <div className="container my-4">
         {loading ? (
           <div className="text-center py-5">
             <span className="spinner-border" role="status" />
           </div>
-        ) : foodCat.length === 0 ? (
-          <h4 className="text-center">No categories found.</h4>
+        ) : Object.keys(filteredItemsByCategory).length === 0 ? (
+          <h4 className="text-center">No items found matching your search.</h4>
         ) : (
-          foodCat.map((cat) => {
-            // All items for this category that match the search term
-            const itemsForCat = foodItem.filter(
-              (item) =>
-                item?.CategoryName === cat?.CategoryName &&
-                item?.name?.toLowerCase().includes(search.toLowerCase())
-            );
-
-            return (
-              <div key={cat._id} className="row mb-4">
-                <div className="fs-3 m-3">{cat.CategoryName}</div>
-                <hr />
-
-                {itemsForCat.length === 0 ? (
-                  <p className="text-muted ms-3">No items match your search.</p>
-                ) : (
-                  itemsForCat.map((item) => (
-                    <div key={item._id} className="col-12 col-md-6 col-lg-3 mb-3">
-                      <Card
-                        foodName={item.name}
-                        imgSrc={item.img}                // may be undefined → handled in Card.js
-                        options={item?.options?.[0]}     // safe optional chaining
-                      />
-                    </div>
-                  ))
-                )}
-              </div>
-            );
-          })
+          Object.entries(filteredItemsByCategory).map(([category, items]) => (
+            <div key={category} className="row mb-4">
+              <div className="fs-3 m-3">{category}</div>
+              <hr />
+              {items.map((item) => (
+                <div key={item._id} className="col-12 col-md-6 col-lg-3 mb-3">
+                  <Card
+                    foodName={item.name}
+                    imgSrc={item.img}
+                    options={item?.options?.[0]}
+                  />
+                </div>
+              ))}
+            </div>
+          ))
         )}
       </div>
 
