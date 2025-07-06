@@ -8,8 +8,14 @@ const OrderSchema = new mongoose.Schema({
   },
   order_data: [
     {
-      order_date: String,
-      items: Array
+      order_date: {
+        type: Date,         // ✅ Correct type for storing date+time
+        default: Date.now   // Optional: fallback if not provided
+      },
+      items: {
+        type: Array,
+        required: true
+      }
     }
   ]
 });

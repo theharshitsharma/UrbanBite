@@ -1,11 +1,13 @@
 import React from 'react';
+import { CartProvider } from './components/ContextReducer';
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './screens/Home';
 import Login from './screens/Login';
 import Signup from './screens/Signup';
 import Cart from './screens/Cart';
 import MyOrder from './screens/MyOrder'
-import { CartProvider } from './components/ContextReducer';
+
 import Navbar from './components/Navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,7 +27,16 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
-      <ToastContainer />
+          <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="dark"
+      />
     </CartProvider>
   );
 }

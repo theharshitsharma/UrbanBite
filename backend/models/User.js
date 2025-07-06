@@ -13,15 +13,27 @@ const UserSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,          // optional but recommended so no two users share the same email
+    unique: true,
   },
   password: {
     type: String,
     required: true,
   },
+  mobile: {
+    type: String,
+    default: "", // Optional field
+  },
+  address: {
+    type: String,
+    default: "", // Optional field
+  },
+  image: {
+    type: String,
+    default: "", // Optional field: you can store image URLs here
+  },
   date: {
     type: Date,
-    default: Date.now,     // default value instead of “required”
+    default: Date.now,
   },
 });
 
