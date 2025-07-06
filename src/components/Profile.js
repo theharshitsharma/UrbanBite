@@ -17,22 +17,34 @@ function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       const email = localStorage.getItem('userEmail');
-      const res = await fetch("https://urbanbite-backend.onrender.com/api/userprofile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      if (!email) {
+        toast.error("No email found. Please login first.");
+        return;
+      }
 
-      const json = await res.json();
-      if (json.success) {
-        setProfile(json.user);
-        setFormData({
-          mobile: json.user.mobile || '',
-          address: json.user.address || '',
-          image: json.user.image || ''
+      try {
+        const res = await fetch("https://urbanbite-backend.onrender.com/api/userprofile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
         });
-      } else {
-        toast.error("Failed to fetch profile.");
+
+        const json = await res.json();
+        console.log("Profile API response:", json);
+
+        if (json.success) {
+          setProfile(json.user);
+          setFormData({
+            mobile: json.user.mobile || '',
+            address: json.user.address || '',
+            image: json.user.image || ''
+          });
+        } else {
+          toast.error("Failed to fetch profile.");
+        }
+      } catch (error) {
+        toast.error("Error fetching profile.");
+        console.error("Fetch profile error:", error);
       }
     };
 
@@ -46,8 +58,40 @@ function Profile() {
     }));
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formDataImg = new FormData();
+    formDataImg.append("file", file);
+    formDataImg.append("upload_preset", "urbanbit_upload"); // ✅ your preset
+
+    try {
+      const res = await fetch("https://api.cloudinary.com/v1_1/dbesvyrov/image/upload", {
+        method: "POST",
+        body: formDataImg
+      });
+
+      const data = await res.json();
+      if (data.secure_url) {
+        setFormData((prev) => ({ ...prev, image: data.secure_url }));
+        toast.success("Image uploaded!");
+      } else {
+        toast.error("Upload failed.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Image upload failed.");
+    }
+  };
+
   const handleSave = async (field) => {
     const email = localStorage.getItem('userEmail');
+    if (!email) {
+      toast.error("No email found.");
+      return;
+    }
+
     const updatePayload = { email };
     updatePayload[field] = formData[field];
 
@@ -86,7 +130,7 @@ function Profile() {
             src={formData.image || 'https://via.placeholder.com/120'}
             alt="Profile"
             className="rounded-circle shadow"
-            style={{ width: "120px", height: "120px", objectFit: "cover" }}
+            style={{ width: "120px", height: "120px", objectFit: "cover", border: '2px solid #ccc' }}
           />
         </div>
 
@@ -105,6 +149,7 @@ function Profile() {
                 value={formData.mobile}
                 onChange={handleChange}
                 className="form-control my-2"
+                placeholder="Enter mobile number"
               />
               <button className="btn btn-sm btn-success" onClick={() => handleSave('mobile')}>Save</button>
             </>
@@ -126,6 +171,7 @@ function Profile() {
                 value={formData.address}
                 onChange={handleChange}
                 className="form-control my-2"
+                placeholder="Enter your address"
               />
               <button className="btn btn-sm btn-success" onClick={() => handleSave('address')}>Save</button>
             </>
@@ -137,9 +183,9 @@ function Profile() {
           )}
         </div>
 
-        {/* Image Field */}
+        {/* Image URL & Upload */}
         <div className="mb-3">
-          <strong>Image URL:</strong>{' '}
+          <strong>Image:</strong>{' '}
           {editField.image ? (
             <>
               <input
@@ -148,12 +194,25 @@ function Profile() {
                 value={formData.image}
                 onChange={handleChange}
                 className="form-control my-2"
+                placeholder="Paste image URL"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control my-2"
+                onChange={handleImageUpload}
               />
               <button className="btn btn-sm btn-success" onClick={() => handleSave('image')}>Save</button>
             </>
           ) : (
             <>
-              {profile.image || 'Not added'}{' '}
+              {profile.image ? (
+                <a href={profile.image} target="_blank" rel="noopener noreferrer">
+                  {profile.image.length > 30
+                    ? `${profile.image.slice(0, 30)}...`
+                    : profile.image}
+                </a>
+              ) : 'Not added'}{' '}
               <button className="btn btn-sm btn-outline-primary ms-2" onClick={() => setEditField({ ...editField, image: true })}>Edit</button>
             </>
           )}
