@@ -12,6 +12,7 @@ import Navbar from './components/Navbar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Profile from './components/Profile';
+import Payment from './components/Payment'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/myOrder" element={<MyOrder />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/payment" element={<Payment />} />
         </Routes>
       </Router>
           <ToastContainer

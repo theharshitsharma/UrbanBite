@@ -13,6 +13,7 @@ function Profile() {
     address: '',
     image: ''
   });
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -64,7 +65,9 @@ function Profile() {
 
     const formDataImg = new FormData();
     formDataImg.append("file", file);
-    formDataImg.append("upload_preset", "urbanbit_upload"); // ✅ your preset
+    formDataImg.append("upload_preset", "urbanbit_upload");
+
+    setIsUploading(true);
 
     try {
       const res = await fetch("https://api.cloudinary.com/v1_1/dbesvyrov/image/upload", {
@@ -82,6 +85,8 @@ function Profile() {
     } catch (err) {
       console.error(err);
       toast.error("Image upload failed.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -202,7 +207,13 @@ function Profile() {
                 className="form-control my-2"
                 onChange={handleImageUpload}
               />
-              <button className="btn btn-sm btn-success" onClick={() => handleSave('image')}>Save</button>
+              <button
+                className="btn btn-sm btn-success"
+                onClick={() => handleSave('image')}
+                disabled={isUploading}
+              >
+                {isUploading ? "Uploading..." : "Save"}
+              </button>
             </>
           ) : (
             <>

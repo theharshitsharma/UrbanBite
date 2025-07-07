@@ -5,6 +5,7 @@ import Delete from '@mui/icons-material/Delete';
 import { useCart, useDispatchCart} from '../components/ContextReducer';
 import { toast } from 'react-toastify';
 
+
 export default function Cart() {
   const data = useCart();
   const dispatch = useDispatchCart();
@@ -18,31 +19,37 @@ let navigate=useNavigate()
   }
 
   const handleCheckOut = async () => {
-    const userEmail = localStorage.getItem("userEmail");
-    console.log("📦 userEmail:", userEmail);
-
-    try {
-      const response = await fetch("https://urbanbite-backend.onrender.com/api/orderData",{
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: userEmail,
-          order: { items: data }
-        })
-      });
-
-      if (response.ok) {
-        dispatch({ type: "DROP" });
-        toast.success("✅ Order placed successfully!");
-        navigate("/myorder")
-      } else {
-        const errorText = await response.text();
-        toast.error("❌ Order failed: " + errorText);
-      }
-    } catch (error) {
-      console.error("Checkout error:", error);
-      toast.error("❌ Checkout error: " + error.message);
+     navigate("/payment", {
+    state: {
+      cartItems: data,
+      totalPrice
     }
+  });
+    // const userEmail = localStorage.getItem("userEmail");
+    // console.log("📦 userEmail:", userEmail);
+
+    // try {
+    //   const response = await fetch("https://urbanbite-backend.onrender.com/api/orderData",{
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({
+    //       email: userEmail,
+    //       order: { items: data }
+    //     })
+    //   });
+
+    //   if (response.ok) {
+    //     dispatch({ type: "DROP" });
+    //     toast.success("✅ Order placed successfully!");
+    //     navigate("/myorder")
+    //   } else {
+    //     const errorText = await response.text();
+    //     toast.error("❌ Order failed: " + errorText);
+    //   }
+    // } catch (error) {
+    //   console.error("Checkout error:", error);
+    //   toast.error("❌ Checkout error: " + error.message);
+    // }
   };
 
   const totalPrice = data.reduce((total, food) => total + food.price, 0);

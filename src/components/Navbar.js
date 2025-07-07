@@ -61,6 +61,7 @@ export default function Navbar() {
                 </li>
               )}
             </ul>
+            <Link className="nav-link" to="/payment">Payment</Link>
 
             {localStorage.getItem("authToken") ? (
               <div className="d-flex align-items-center gap-2">

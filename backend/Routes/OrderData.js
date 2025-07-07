@@ -4,7 +4,7 @@ const Order = require('../models/Orders');
 
 // 📦 Place a New Order
 router.post('/orderData', async (req, res) => {
-  const { email, order } = req.body;
+  const { email, order,paymentId } = req.body;
 
   if (!email || !order || !Array.isArray(order.items)) {
     return res.status(400).json({ error: "Invalid order payload." });

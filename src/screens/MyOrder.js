@@ -129,6 +129,11 @@ export default function MyOrder() {
                         >
                           🗑️
                         </button>
+                        <div className="m-auto mt-3 w-100">
+  <strong>Order Date:</strong> {formatDateTime(orderGroup.order_date)} <br />
+  <strong>Payment ID:</strong> {orderGroup.paymentId || 'N/A'}
+</div>
+
                       </div>
                     </div>
                   </div>
