@@ -4,15 +4,16 @@ const Order = require('../models/Orders');
 
 // 📦 Place a New Order
 router.post('/orderData', async (req, res) => {
-  const { email, order,paymentId } = req.body;
+  const { email, order, paymentId } = req.body;
 
   if (!email || !order || !Array.isArray(order.items)) {
     return res.status(400).json({ error: "Invalid order payload." });
   }
 
   const orderEntry = {
-    order_date: new Date(),     // ✅ stores full date + time
-    items: order.items
+    order_date: new Date(),     // ✅ Store full date + time
+    items: order.items,
+    paymentId: paymentId || null // ✅ Optional: store payment ID
   };
 
   try {
@@ -37,7 +38,6 @@ router.post('/orderData', async (req, res) => {
   }
 });
 
-
 // 📥 Fetch All Orders for a User
 router.post('/myorderData', async (req, res) => {
   try {
@@ -60,51 +60,49 @@ router.delete('/deleteOrder', async (req, res) => {
 
   try {
     const userOrder = await Order.findOne({ email });
-
     if (!userOrder) {
-      return res.status(404).json({ success: false, error: 'User order not found' });
+      return res.status(404).json({ success: false, error: 'User not found' });
     }
 
-    const originalLength = userOrder.order_data.length;
+    const initialLength = userOrder.order_data.length;
 
     userOrder.order_data = userOrder.order_data.filter(
       group => group._id.toString() !== orderGroupId
     );
 
-    if (userOrder.order_data.length === originalLength) {
-      return res.status(400).json({ success: false, error: 'Order group not found' });
+    if (userOrder.order_data.length === initialLength) {
+      return res.status(404).json({ success: false, error: 'Order group not found' });
     }
 
     await userOrder.save();
     res.json({ success: true });
   } catch (err) {
-    console.error("Delete error:", err);
+    console.error("❌ Delete Order Error:", err);
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
 
-// ❌ Delete a Specific Item from an Order Group
+// 🗑️ Delete a Specific Item from an Order Group
 router.delete('/deleteItemFromData', async (req, res) => {
   const { email, orderDate, name, size } = req.body;
 
   try {
     const userOrder = await Order.findOne({ email });
-
     if (!userOrder) {
-      return res.status(404).json({ success: false, error: 'User order not found' });
+      return res.status(404).json({ success: false, error: 'User not found' });
     }
 
     let updated = false;
 
     userOrder.order_data.forEach(group => {
-      if (new Date(group.order_date).getTime() === new Date(orderDate).getTime()) {
-        const originalLength = group.items.length;
+      const isSameDate = new Date(group.order_date).getTime() === new Date(orderDate).getTime();
 
+      if (isSameDate) {
+        const before = group.items.length;
         group.items = group.items.filter(
           item => !(item.name === name && item.size === size)
         );
-
-        if (group.items.length !== originalLength) {
+        if (group.items.length !== before) {
           updated = true;
         }
       }
@@ -114,13 +112,13 @@ router.delete('/deleteItemFromData', async (req, res) => {
     userOrder.order_data = userOrder.order_data.filter(group => group.items.length > 0);
 
     if (!updated) {
-      return res.status(400).json({ success: false, error: 'Item not found' });
+      return res.status(404).json({ success: false, error: 'Item not found' });
     }
 
     await userOrder.save();
     res.json({ success: true });
   } catch (err) {
-    console.error("Delete error:", err);
+    console.error("❌ Delete Item Error:", err);
     res.status(500).json({ success: false, error: 'Server error' });
   }
 });
