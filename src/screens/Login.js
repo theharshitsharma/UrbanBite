@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatchCart } from '../components/ContextReducer';
 import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
+
 import 'react-toastify/dist/ReactToastify.css';
+
 
 export default function Login() {
   const [credentials, setcredentials] = useState({
@@ -11,6 +14,45 @@ export default function Login() {
   });
 
   let navigate = useNavigate();
+ const handleGoogleSuccess = async (response) => {
+  const { credential } = response;
+  try {
+    const res = await fetch("https://urbanbite-backend.onrender.com/api/googlelogin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential })
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      localStorage.setItem("userEmail", json.user.email);
+      localStorage.setItem("authToken", json.token);
+
+      toast.success("Logged in with Google!", {
+        position: "top-center",
+        autoClose: 1500,
+        onClose: () => navigate("/") // ✅ Navigate *after* toast shows
+      });
+    } else {
+      toast.error(json.message || "Google login failed", {
+        position: "top-center", autoClose: 3000
+      });
+    }
+  } catch {
+    toast.error("Server error during Google login", {
+      position: "top-center", autoClose: 3000
+    });
+  }
+};
+
+
+const handleGoogleError = () => {
+  toast.error("Google sign-in failed", {
+    position: "top-center", autoClose: 3000
+  });
+};
+
   const dispatch = useDispatchCart(); 
 
   const handleSubmit = async (e) => {
@@ -98,6 +140,11 @@ export default function Login() {
             />
           </div>
           <button type="submit" className="btn btn-primary w-100">Login</button>
+          <div className="text-center my-3">— or —</div>
+<div className="d-flex justify-content-center mb-3">
+  <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+</div>
+
           <Link to="/createuser" className="btn btn-outline-light w-100 mt-3">New user?</Link>
         </form>
       </div>

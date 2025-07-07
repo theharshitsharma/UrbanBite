@@ -91,24 +91,39 @@ if (json.success) {
 
 
   const handleGoogleSuccess = async (response) => {
-    const { credential } = response;
-    // Send credential to backend (for token validation & user creation/login)
-    try {
-      const res = await fetch("https://urbanbite-backend.onrender.com/api/googlelogin", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential })
+  const { credential } = response;
+  try {
+    const res = await fetch("https://urbanbite-backend.onrender.com/api/googlelogin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential })
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      // ✅ Save user data to localStorage
+      localStorage.setItem("userEmail", json.user.email);
+      localStorage.setItem("authToken", json.token);  // if your backend sends one
+      localStorage.setItem("userName", json.user.name);
+
+      toast.success("Logged in with Google!", {
+        position: "top-center",
+        autoClose: 1500,
+        onClose: () => navigate("/")
       });
-      const json = await res.json();
-      if (json.success) {
-        toast.success("Logged in with Google!", { position: "top-center", autoClose: 1500 });
-        navigate("/");
-      } else {
-        toast.error(json.message || "Google login failed", { position: "top-center", autoClose: 3000 });
-      }
-    } catch {
-      toast.error("Server error during Google login", { position: "top-center", autoClose: 3000 });
+    } else {
+      toast.error(json.message || "Google login failed", {
+        position: "top-center", autoClose: 3000
+      });
     }
-  };
+  } catch {
+    toast.error("Server error during Google login", {
+      position: "top-center", autoClose: 3000
+    });
+  }
+};
+
 
   const handleGoogleError = () => {
     toast.error("Google sign-in failed", { position: "top-center", autoClose: 3000 });
