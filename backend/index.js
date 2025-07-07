@@ -22,6 +22,7 @@ app.use("/api", require("./Routes/CreateUser"));
 app.use("/api", require("./Routes/DisplayData"));
 app.use("/api", require("./Routes/OrderData"));
 app.use("/api", require("./Routes/Profile"));
+app.use('/api', require('./Routes/Auth'));
 
 app.use("/api", require("./Routes/Otp"));
 

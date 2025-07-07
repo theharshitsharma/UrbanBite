@@ -72,7 +72,6 @@ export default function MyOrder() {
     }
   };
 
-  // 🕒 Format date-time for display in local timezone (IST)
   const formatDateTime = (isoDate) => {
     return new Date(isoDate).toLocaleString("en-IN", {
       weekday: "short",
@@ -87,63 +86,61 @@ export default function MyOrder() {
   };
 
   return (
-    <div>
-      <div className="container">
-        <div className="row">
-          {orderData.length > 0 ? (
-            orderData.slice(0).reverse().map((orderGroup, index) => (
-              <React.Fragment key={index}>
-                <div className="m-auto mt-5 w-100">
-                  <strong>Order Date:</strong>{" "}
-                  {formatDateTime(orderGroup.order_date)}
-
+    <div className="container py-4">
+      <div className="row">
+        {orderData.length > 0 ? (
+          orderData.slice(0).reverse().map((orderGroup, index) => (
+            <React.Fragment key={index}>
+              <div className="col-12 mt-4">
+                <div className="d-flex justify-content-between align-items-center bg-light p-3 rounded shadow-sm">
+                  <div>
+                    <strong>Order Date:</strong> {formatDateTime(orderGroup.order_date)}<br />
+                    <strong>Payment ID:</strong> {orderGroup.paymentId || 'N/A'}
+                  </div>
                   <button
-                    className="btn btn-danger btn-sm float-end"
+                    className="btn btn-sm btn-danger"
                     onClick={() => deleteOrder(orderGroup._id)}
                   >
-                    Delete
+                    Delete Entire Order
                   </button>
-                  <hr />
                 </div>
+              </div>
 
-                {orderGroup.items.map((item, i) => (
-                  <div className="col-12 col-md-6 col-lg-3" key={i}>
-                    <div className="card mt-3" style={{ width: "16rem", maxHeight: "360px" }}>
-                      <img
-                        src={item.img}
-                        className="card-img-top"
-                        alt={item.name}
-                        style={{ height: "120px", objectFit: "fill" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title">{item.name}</h5>
-                        <div className="container w-100 p-0" style={{ height: "38px" }}>
-                          <span className="m-1">{item.qty}</span>
-                          <span className="m-1">{item.size}</span>
-                          <span className="m-1">₹{item.price}/-</span>
-                        </div>
-                        <span className="m-1">₹{item.price}/-</span>
+              {orderGroup.items.map((item, i) => (
+                <div className="col-12 col-md-6 col-lg-3 mt-4" key={i}>
+                  <div className="card shadow-sm h-100">
+                    <img
+                      src={item.img}
+                      className="card-img-top"
+                      alt={item.name}
+                      style={{ height: "150px", objectFit: "cover" }}
+                    />
+                    <div className="card-body d-flex flex-column">
+                      <h5 className="card-title">{item.name}</h5>
+                      <div className="mb-2">
+                        <span className="badge bg-primary me-1">Qty: {item.qty}</span>
+                        <span className="badge bg-secondary me-1">Size: {item.size}</span>
+                        <span className="badge bg-success">₹{item.price}</span>
+                      </div>
+                      <div className="mt-auto d-flex justify-content-end">
                         <button
-                          className="btn btn-sm btn-outline-danger float-end"
+                          className="btn btn-sm btn-outline-danger"
                           onClick={() => deleteSingleItem(orderGroup.order_date, item)}
                         >
-                          🗑️
+                          🗑️ Remove
                         </button>
-                        <div className="m-auto mt-3 w-100">
-  <strong>Order Date:</strong> {formatDateTime(orderGroup.order_date)} <br />
-  <strong>Payment ID:</strong> {orderGroup.paymentId || 'N/A'}
-</div>
-
                       </div>
                     </div>
                   </div>
-                ))}
-              </React.Fragment>
-            ))
-          ) : (
-            <div className="text-center fs-4 w-100 mt-5">🛒 No orders found.</div>
-          )}
-        </div>
+                </div>
+              ))}
+            </React.Fragment>
+          ))
+        ) : (
+          <div className="text-center fs-4 w-100 mt-5 text-muted">
+            🛒 No orders found.
+          </div>
+        )}
       </div>
     </div>
   );

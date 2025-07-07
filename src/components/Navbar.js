@@ -12,7 +12,7 @@ export default function Navbar() {
   const dispatch = useDispatchCart();
 
   const handleLogout = () => {
-    dispatch({ type: "DROP" }); // Reset cart state
+    dispatch({ type: "DROP" });
     localStorage.removeItem("authToken");
     localStorage.removeItem("userEmail");
     navigate("/login");
@@ -27,12 +27,11 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-success">
-        <div className="container-fluid">
-          <Link className="navbar-brand fs-1 fst-italic" to="/">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+        <div className="container-fluid px-4">
+          <Link className="navbar-brand fs-2 fw-bold fst-italic" to="/">
             UrbanBite
           </Link>
-          
 
           <button
             className="navbar-toggler"
@@ -60,39 +59,44 @@ export default function Navbar() {
                   </Link>
                 </li>
               )}
+              <li className="nav-item">
+                <Link className="nav-link fs-5" to="/payment">
+                  Payment
+                </Link>
+              </li>
             </ul>
-            <Link className="nav-link" to="/payment">Payment</Link>
 
             {localStorage.getItem("authToken") ? (
-              <div className="d-flex align-items-center gap-2">
-                <ThemeToggle/>
+              <div className="d-flex align-items-center gap-3">
+                <ThemeToggle />
+
                 <button
-                  className="btn btn-light text-success position-relative"
+                  className="btn btn-outline-light position-relative"
                   onClick={handleCartOpen}
                 >
-                  My Cart
+                  🛒 My Cart
                   <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle">
                     {cartData.reduce((total, item) => total + item.qty, 0)}
                   </Badge>
                 </button>
 
-                <Link className="btn btn-light text-success" to="/profile">
-                  View Profile
+                <Link className="btn btn-light text-success fw-semibold" to="/profile">
+                  Profile
                 </Link>
 
                 <button
-                  className="btn btn-light text-success"
+                  className="btn btn-outline-light fw-semibold"
                   onClick={handleLogout}
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="d-flex">
-                <Link className="btn btn-outline-light mx-1" to="/login">
+              <div className="d-flex gap-2">
+                <Link className="btn btn-outline-light" to="/login">
                   Login
                 </Link>
-                <Link className="btn btn-light text-success mx-1" to="/createuser">
+                <Link className="btn btn-light text-success fw-semibold" to="/createuser">
                   Sign Up
                 </Link>
               </div>
@@ -103,22 +107,30 @@ export default function Navbar() {
 
       {/* Cart Modal */}
       <Modal show={cartView} onHide={handleCartClose} centered>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className="bg-success text-white">
           <Modal.Title>Your Cart</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p className="fw-bold">Total Items: {cartData.reduce((a, i) => a + i.qty, 0)}</p>
-          <p className="fw-bold">Total Price: ₹{cartData.reduce((a, i) => a + i.price, 0)}</p>
+          <div className="mb-3">
+            <p className="fw-bold mb-1">Total Items: {cartData.reduce((a, i) => a + i.qty, 0)}</p>
+            <p className="fw-bold mb-2">Total Price: ₹{cartData.reduce((a, i) => a + i.price, 0)}</p>
+          </div>
 
           {cartData.length === 0 ? (
-            <p>Your cart is empty.</p>
+            <p className="text-muted">Your cart is empty.</p>
           ) : (
-            <ul className="list-unstyled">
+            <ul className="list-group">
               {cartData.map((item, index) => (
-                <li key={`${item.name}-${index}`} className="d-flex justify-content-between align-items-center mb-2">
-                  <span>{item.name} (Qty: {item.qty}, Size: {item.size}) - ₹{item.price}</span>
+                <li
+                  key={`${item.name}-${index}`}
+                  className="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  <div>
+                    {item.name} <span className="text-muted">(x{item.qty}, {item.size})</span>
+                    <div className="text-success fw-semibold">₹{item.price}</div>
+                  </div>
                   <button
-                    className="btn btn-sm btn-danger"
+                    className="btn btn-sm btn-outline-danger"
                     onClick={() => handleRemove(index)}
                   >
                     Remove
@@ -133,7 +145,7 @@ export default function Navbar() {
             Close
           </button>
           {cartData.length > 0 && (
-            <Link to="/cart" className="btn btn-primary" onClick={handleCartClose}>
+            <Link to="/cart" className="btn btn-success" onClick={handleCartClose}>
               Go to Cart
             </Link>
           )}

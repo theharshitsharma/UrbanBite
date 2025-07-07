@@ -1,96 +1,87 @@
 import React from 'react';
-import {  useNavigate } from 'react-router-dom';
-
+import { useNavigate } from 'react-router-dom';
 import Delete from '@mui/icons-material/Delete';
-import { useCart, useDispatchCart} from '../components/ContextReducer';
+import { useCart, useDispatchCart } from '../components/ContextReducer';
 import { toast } from 'react-toastify';
-
 
 export default function Cart() {
   const data = useCart();
   const dispatch = useDispatchCart();
-let navigate=useNavigate()
+  const navigate = useNavigate();
+
+  const totalPrice = data.reduce((total, food) => total + food.price, 0);
+
+  const handleCheckOut = () => {
+    navigate("/payment", {
+      state: {
+        cartItems: data,
+        totalPrice
+      }
+    });
+  };
+
   if (data.length === 0) {
     return (
-      <div>
-        <div className='m-5 w-100 text-center fs-3'>The Cart is Empty!</div>
+      <div className="container text-center py-5">
+        <h3 className="text-muted">
+          🛒 Your cart is empty!
+        </h3>
+        <p className="text-secondary">Looks like you're hungry — go add something tasty.</p>
       </div>
     );
   }
 
-  const handleCheckOut = async () => {
-     navigate("/payment", {
-    state: {
-      cartItems: data,
-      totalPrice
-    }
-  });
-    // const userEmail = localStorage.getItem("userEmail");
-    // console.log("📦 userEmail:", userEmail);
-
-    // try {
-    //   const response = await fetch("https://urbanbite-backend.onrender.com/api/orderData",{
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({
-    //       email: userEmail,
-    //       order: { items: data }
-    //     })
-    //   });
-
-    //   if (response.ok) {
-    //     dispatch({ type: "DROP" });
-    //     toast.success("✅ Order placed successfully!");
-    //     navigate("/myorder")
-    //   } else {
-    //     const errorText = await response.text();
-    //     toast.error("❌ Order failed: " + errorText);
-    //   }
-    // } catch (error) {
-    //   console.error("Checkout error:", error);
-    //   toast.error("❌ Checkout error: " + error.message);
-    // }
-  };
-
-  const totalPrice = data.reduce((total, food) => total + food.price, 0);
-
   return (
-    <div>
-      <div className='container m-auto mt-5 table-responsive table-responsive-sm table-responsive-md'>
-        <table className='table table-hover'>
-          <thead className='text-success fs-4'>
-            <tr>
-              <th scope='col'>#</th>
-              <th scope='col'>Name</th>
-              <th scope='col'>Quantity</th>
-              <th scope='col'>Option</th>
-              <th scope='col'>Amount</th>
-              <th scope='col'></th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((food, index) => (
-              <tr key={index}>
-                <th scope='row'>{index + 1}</th>
-                <td>{food.name}</td>
-                <td>{food.qty}</td>
-                <td>{food.size}</td>
-                <td>{food.price}</td>
-                <td>
-                  <button type="button" className="btn p-0">
-                    <Delete onClick={() => {
-                      dispatch({ type: "REMOVE", index });
-                      toast.info("Item removed from cart");
-                    }} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div><h1 className='fs-2'>Total Price: ₹{totalPrice}/-</h1></div>
-        <div>
-          <button className='btn bg-success mt-5' onClick={handleCheckOut}>Check Out</button>
+    <div className="container my-5">
+      <div className="card shadow-sm border-0">
+        <div className="card-body">
+          <h3 className="card-title text-success mb-4">🧾 Your Cart</h3>
+
+          <div className="table-responsive">
+            <table className="table table-striped table-hover align-middle">
+              <thead className="table-success text-center">
+                <tr>
+                  <th>#</th>
+                  <th>Item</th>
+                  <th>Quantity</th>
+                  <th>Size</th>
+                  <th>Price</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody className="text-center">
+                {data.map((food, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{food.name}</td>
+                    <td>{food.qty}</td>
+                    <td>{food.size}</td>
+                    <td>₹{food.price}</td>
+                    <td>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => {
+                          dispatch({ type: "REMOVE", index });
+                          toast.info("Item removed from cart");
+                        }}
+                      >
+                        <Delete fontSize="small" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center mt-4">
+            <h4 className="fw-semibold text-dark">
+              Total Price: <span className="text-success">₹{totalPrice}/-</span>
+            </h4>
+            <button className="btn btn-success btn-lg" onClick={handleCheckOut}>
+              ✅ Proceed to Checkout
+            </button>
+          </div>
         </div>
       </div>
     </div>
