@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken'); // ✅ Add this
 const User = require('../models/User');
 const { OAuth2Client } = require('google-auth-library');
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); // store this safely in .env
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/googlelogin', async (req, res) => {
   const { credential } = req.body;
 
   try {
-    // Verify token from frontend
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -24,18 +24,22 @@ router.post('/googlelogin', async (req, res) => {
       user = new User({
         name,
         email,
-        password: "", // or "google-user" if required
-        location: "Google User"
+        password: "", // or "google-user"
+        location: "Google User",
       });
       await user.save();
     }
 
-    // Optionally, generate JWT token for your own session
-    return res.json({ success: true, user });
+    // ✅ Create a token
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '7d', // or any duration you prefer
+    });
+
+    res.json({ success: true, user, token }); // ✅ return token
 
   } catch (err) {
     console.error("Google login error:", err);
-    return res.status(500).json({ success: false, message: "Google login failed" });
+    res.status(500).json({ success: false, message: "Google login failed" });
   }
 });
 
