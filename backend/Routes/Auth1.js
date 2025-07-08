@@ -52,13 +52,11 @@ router.post("/googlelogin", async (req, res) => {
         email: user.email,
       },
     });
-  } catch (error) {
-    console.error("Google login error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Server error during Google login",
-    });
-  }
+  } catch (err) {
+  console.error("Google login error:", err.message, err.stack); // log full error
+  res.status(500).json({ success: false, message: "Google login failed" });
+}
+
 });
 
 module.exports = router;
