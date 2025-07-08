@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const JWT_SECRET = process.env.JWT_SECRET || "yoursecretkey";
+const JWT_SECRET = process.env.JWT_SECRET || "3d9f0a2c9a1f3d0b6c7e1a8a6d2c3b4f"
+;
 
 // Use this if you want to verify the Google token instead of decoding it blindly
 const { OAuth2Client } = require("google-auth-library");
