@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken'); // ✅ Add this
+const jwt = require('jsonwebtoken'); 
 const User = require('../models/User');
 const { OAuth2Client } = require('google-auth-library');
 

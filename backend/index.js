@@ -6,7 +6,7 @@ const connectDB = require("./db");
 const PORT = process.env.PORT || 5000;
 
 const allowedOrigins = [
-  "http://localhost:10000",
+  "http://localhost:3000",
   
   "https://urbanbite-4ewi.onrender.com"
 ];
