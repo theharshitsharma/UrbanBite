@@ -19,30 +19,29 @@ export default function Home() {
   }, [search]);
 
   // Fetch food data on mount
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const BASE_URL =
-          process.env.NODE_ENV === "development"
-            ? "http://localhost:5000"
-            : "https://urbanbite-backend.onrender.com";
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
-        const res = await fetch(`${BASE_URL}/api/foodData`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        });
-        const data = await res.json();
-        setFoodItem(Array.isArray(data?.[0]) ? data[0] : []);
-        setFoodCat(Array.isArray(data?.[1]) ? data[1] : []);
-      } catch (err) {
-        console.error("Error fetching foodData:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const res = await fetch(`${BASE_URL}/api/foodData`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
 
-    fetchData();
-  }, []);
+      const data = await res.json();
+      setFoodItem(Array.isArray(data?.[0]) ? data[0] : []);
+      setFoodCat(Array.isArray(data?.[1]) ? data[1] : []);
+    } catch (err) {
+      console.error("Error fetching foodData:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, []);
+
 
   // Memoized filtered items grouped by category
   const filteredItemsByCategory = useMemo(() => {
