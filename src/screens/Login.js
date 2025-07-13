@@ -1,98 +1,100 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatchCart } from '../components/ContextReducer';
 import { toast } from "react-toastify";
 import { GoogleLogin } from "@react-oauth/google";
-
 import 'react-toastify/dist/ReactToastify.css';
 
-
 export default function Login() {
-  const [credentials, setcredentials] = useState({
-    email: "",
-    password: "",
-  });
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [redirectToHome, setRedirectToHome] = useState(false);
+  const dispatch = useDispatchCart();
+  const navigate = useNavigate();
 
-  let navigate = useNavigate();
- const handleGoogleSuccess = async (response) => {
-  const { credential } = response;
-  try {
-    const res = await fetch("https://urbanbite-backend.onrender.com/api/googlelogin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential })
-    });
-
-    const json = await res.json();
-
-    if (json.success) {
-      localStorage.setItem("userEmail", json.user.email);
-      localStorage.setItem("authToken", json.token);
-
-      toast.success("Logged in with Google!", {
-        position: "top-center",
-        autoClose: 1500,
-        onClose: () => navigate("/") // ✅ Navigate *after* toast shows
-      });
-    } else {
-      toast.error(json.message || "Google login failed", {
-        position: "top-center", autoClose: 3000
-      });
+  // Redirect after toast
+  useEffect(() => {
+    if (redirectToHome) {
+      navigate("/");
     }
-  } catch {
-    toast.error("Server error during Google login", {
-      position: "top-center", autoClose: 3000
-    });
-  }
-};
+  }, [redirectToHome, navigate]);
 
-
-const handleGoogleError = () => {
-  toast.error("Google sign-in failed", {
-    position: "top-center", autoClose: 3000
-  });
-};
-
-  const dispatch = useDispatchCart(); 
+  const onChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch("https://urbanbite-backend.onrender.com/api/loginuser",{
+    const res = await fetch("https://urbanbite-backend.onrender.com/api/loginuser", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: credentials.email,
         password: credentials.password,
       }),
     });
 
-    const json = await response.json();
-    console.log(json);
-    if(json.success){
-    toast.success("Login successful!!!", {
-              position: "top-center",
-              autoClose: 2000,
-              onClose: () => navigate("/")
-            });}
+    const json = await res.json();
 
-    if (!json.success) {
-      alert("Invalid email or password");
-      return;
+    if (json.success) {
+      toast.success("Login successful!", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+
+      localStorage.setItem("userEmail", credentials.email);
+      localStorage.setItem("authToken", json.authToken);
+      dispatch({ type: "DROP" });
+
+      setRedirectToHome(true); // 👈 Safe redirect after toast
+    } else {
+      toast.error("Invalid email or password", {
+        position: "top-center",
+        autoClose: 3000,
+      });
     }
-    dispatch({ type: "DROP" });
-
-
-    localStorage.setItem("userEmail", credentials.email);
-    localStorage.setItem("authToken", json.authToken);
-     
-    navigate("/");
   };
 
-  const onChange = (event) => {
-    setcredentials({ ...credentials, [event.target.name]: event.target.value });
+  const handleGoogleSuccess = async (response) => {
+    const { credential } = response;
+    try {
+      const res = await fetch("https://urbanbite-backend.onrender.com/api/googlelogin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential })
+      });
+
+      const json = await res.json();
+
+      if (json.success) {
+        localStorage.setItem("userEmail", json.user.email);
+        localStorage.setItem("authToken", json.token);
+
+        toast.success("Logged in with Google!", {
+          position: "top-center",
+          autoClose: 1500,
+        });
+
+        setRedirectToHome(true); // 👈 Triggers redirect
+      } else {
+        toast.error(json.message || "Google login failed", {
+          position: "top-center",
+          autoClose: 3000
+        });
+      }
+    } catch {
+      toast.error("Server error during Google login", {
+        position: "top-center",
+        autoClose: 3000
+      });
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.error("Google sign-in failed", {
+      position: "top-center",
+      autoClose: 3000
+    });
   };
 
   return (
@@ -140,13 +142,17 @@ const handleGoogleError = () => {
             />
           </div>
           <button type="submit" className="btn btn-primary w-100">Login</button>
-          <div className="text-center my-3">— or —</div>
-<div className="d-flex justify-content-center mb-3">
-  <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
-</div>
-
-          <Link to="/createuser" className="btn btn-outline-light w-100 mt-3">New user?</Link>
         </form>
+
+        <div className="text-center my-3">— or —</div>
+
+        <div className="d-flex justify-content-center mb-3">
+          <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+        </div>
+
+        <Link to="/createuser" className="btn btn-outline-light w-100 mt-3">
+          New user?
+        </Link>
       </div>
     </div>
   );

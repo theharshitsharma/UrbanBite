@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const { Schema } = mongoose;  // ✅ REQUIRED
 
 const UserSchema = new Schema({
   name: {
@@ -17,19 +17,21 @@ const UserSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function () {
+      return this.location !== 'Google User';  // ✅ Optional for Google users
+    },
   },
   mobile: {
     type: String,
-    default: "", // Optional field
+    default: "",
   },
   address: {
     type: String,
-    default: "", // Optional field
+    default: "",
   },
   image: {
     type: String,
-    default: "", // Optional field: you can store image URLs here
+    default: "",
   },
   date: {
     type: Date,
